@@ -14,5 +14,6 @@ public class DscatalogApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		System.out.println(DscatalogApplication.this);
+		System.out.println(args);
 	}
 }
