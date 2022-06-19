@@ -45,9 +45,9 @@ public class CategoryService {
 
 	@Transactional(readOnly = false)
 	public CategoryDTO update(Long id, CategoryDTO dto) {
-		Category entity = repository.getOne(id);
-		entity.setName(dto.getName());
 		try {
+			Category entity = repository.getOne(id);
+			entity.setName(dto.getName());
 			entity = repository.save(entity);
 			return new CategoryDTO(entity);
 		} catch (EntityNotFoundException e) {
@@ -62,6 +62,6 @@ public class CategoryService {
 			throw new ResourceNotFoundException("Id not found " + id);
 		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException("Integrity Violation");
-		}		
+		}
 	}
 }
