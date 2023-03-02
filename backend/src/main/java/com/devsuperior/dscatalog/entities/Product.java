@@ -21,13 +21,22 @@ import javax.persistence.Table;
 public class Product implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
 	private String name;
+	
+	@Column(columnDefinition = "text")
 	private String description;
 	private Double price;
 	private String imgUrl;
+	
+	@Column(columnDefinition = "timestamp without time zone")
 	private Instant date;
 
+	@ManyToMany
+	@JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
 	Set<Category> categories = new HashSet<>();
 
 	public Product() {
@@ -42,8 +51,6 @@ public class Product implements Serializable {
 		this.date = date;
 	}
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Long getId() {
 		return id;
 	}
@@ -60,7 +67,6 @@ public class Product implements Serializable {
 		this.name = name;
 	}
 
-	@Column(columnDefinition = "text")
 	public String getDescription() {
 		return description;
 	}
@@ -85,7 +91,6 @@ public class Product implements Serializable {
 		this.imgUrl = imgUrl;
 	}
 
-	@Column(columnDefinition = "timestamp without time zone")
 	public Instant getDate() {
 		return date;
 	}
@@ -94,14 +99,8 @@ public class Product implements Serializable {
 		this.date = date;
 	}
 
-	@ManyToMany
-	@JoinTable(name = "tb_product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
 	public Set<Category> getCategories() {
 		return categories;
-	}
-
-	public void setCategories(Set<Category> categories) {
-		this.categories = categories;
 	}
 
 	@Override
