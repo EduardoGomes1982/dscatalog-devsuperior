@@ -10,6 +10,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.devsuperior.dscatalog.dto.ProductDTO;
@@ -60,6 +61,7 @@ public class ProductService {
 		}
 	}
 
+	@Transactional(readOnly = false, propagation = Propagation.SUPPORTS)
 	public void delete(Long id) {
 		try {
 			repository.deleteById(id);
