@@ -15,7 +15,7 @@ import com.devsuperior.dscatalog.tests.Factory;
 @DataJpaTest
 public class CategoryRepositoryTests {
     @Autowired
-    private CategoryRepository categoryRepository;
+    private CategoryRepository repository;
 
     private long existingId;
     private long nonExistingId;
@@ -30,15 +30,15 @@ public class CategoryRepositoryTests {
 
     @Test
     public void deleteShouldDeleteObjectWhenIdExists() {
-        categoryRepository.deleteById(existingId);
-        Optional<Category> result = categoryRepository.findById(existingId);
+        repository.deleteById(existingId);
+        Optional<Category> result = repository.findById(existingId);
         Assertions.assertFalse(result.isPresent());
     }
 
     @Test
     public void deleteShouldThrowEmptyResultDataAccessExceptionWhenIdDoesNotExists() {
         Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
-            categoryRepository.deleteById(nonExistingId);
+            repository.deleteById(nonExistingId);
         });
     }
 
@@ -46,20 +46,34 @@ public class CategoryRepositoryTests {
     public void saveShouldPersistWithAutoincrementWhenIdIsNull() {
         Category category = Factory.createCategory();
         category.setId(null);
-        category = categoryRepository.save(category);
+        category = repository.save(category);
         Assertions.assertNotNull(category.getId());
         Assertions.assertEquals(countTotalCategories + 1, category.getId());
     }
 
     @Test
+    public void saveShouldPersistWithDataUpdateWhenIdDoesNotNull() {
+        Category category = Factory.createCategory();
+        Category categoryPersisted = repository.save(category);
+        Assertions.assertNotNull(categoryPersisted.getId());
+        Assertions.assertEquals(categoryPersisted.getId(), category.getId());
+        Assertions.assertEquals(categoryPersisted.getName(), category.getName());
+    }
+
+    @Test
     public void findByIdShouldReturnOptionalWhenIdExist() {
-        Optional<Category> category = categoryRepository.findById(existingId);
+        Optional<Category> category = repository.findById(existingId);
         Assertions.assertTrue(category.isPresent());
     }
 
     @Test
     public void findByIdShouldReturnEmptyOptionalWhenIdDoesNotExist() {
-        Optional<Category> category = categoryRepository.findById(nonExistingId);
+        Optional<Category> category = repository.findById(nonExistingId);
         Assertions.assertFalse(category.isPresent());
+    }
+
+    @Test
+    public void findAllShouldReturnTotalRegistry() {
+        
     }
 }
