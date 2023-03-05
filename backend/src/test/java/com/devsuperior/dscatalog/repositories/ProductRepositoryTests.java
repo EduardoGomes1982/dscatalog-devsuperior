@@ -23,7 +23,7 @@ public class ProductRepositoryTests {
 
     @BeforeEach
     void setUp() {
-        existingId = 4L;
+        existingId = 1L;
         nonExistingId = 1000L;
         countTotalProducts = 25L;
     }
@@ -68,6 +68,7 @@ public class ProductRepositoryTests {
         Assertions.assertEquals(productPersisted.getDescription(), product.getDescription());
         Assertions.assertEquals(productPersisted.getDate(), product.getDate());
         Assertions.assertEquals(productPersisted.getImgUrl(), product.getImgUrl());
+        Assertions.assertEquals(countTotalProducts, repository.count());
     }
 
     @Test

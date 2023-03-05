@@ -24,14 +24,14 @@ public class ProductServiceIT {
     @Autowired
     private ProductRepository productRepository;
 
-    private long dependentExistingId;
+    private long existingId;
     private long nonDependetExistingId;
     private long nonExistingId;
     private long countTotalProduct;
 
     @BeforeEach
     void setUp() throws Exception {
-        dependentExistingId = 1L;
+        existingId = 1L;
         nonDependetExistingId = 4L;
         nonExistingId = 30L;
         countTotalProduct = 25L;
@@ -39,9 +39,8 @@ public class ProductServiceIT {
 
     @Test
     public void deleteShouldDeleteResourceWhenIdDependentExists() {
-        Assertions.assertThrows(DataIntegrityViolationException.class, () -> {
-            productService.delete(dependentExistingId);
-        });
+        productService.delete(existingId);
+        Assertions.assertEquals(countTotalProduct - 1, productRepository.count());
     }
 
     @Test

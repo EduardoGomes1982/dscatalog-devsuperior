@@ -1,5 +1,6 @@
 package com.devsuperior.dscatalog.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -25,7 +26,7 @@ public class CategoryRepositoryTests {
     void setUp() {
         existingId = 1L;
         nonExistingId = 1000L;
-        countTotalCategories = 3L;
+        countTotalCategories = 4L;
     }
 
     @Test
@@ -73,7 +74,9 @@ public class CategoryRepositoryTests {
     }
 
     @Test
-    public void findAllShouldReturnTotalRegistry() {
-        
+    public void findAllShouldReturnListCategories() {
+        List<Category> result = repository.findAll();
+        Assertions.assertEquals(countTotalCategories, result.size());
+        Assertions.assertEquals(result.get(0).getName(), "Livros");
     }
 }

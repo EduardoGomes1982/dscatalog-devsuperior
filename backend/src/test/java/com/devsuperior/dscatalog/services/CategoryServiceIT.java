@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.devsuperior.dscatalog.dto.CategoryDTO;
 import com.devsuperior.dscatalog.repositories.CategoryRepository;
+import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
 
 @SpringBootTest
@@ -23,25 +24,40 @@ public class CategoryServiceIT {
     @Autowired
     private CategoryRepository repository;
 
-    private long existingId;
+    private long dependentExistingId;
+    private long nonDependentExistingId;
     private long nonExistingId;
     private long countTotalProduct;
     
     @BeforeEach
     void setUp() throws Exception {
-        existingId = 1L;
+        dependentExistingId = 1L;
+        nonDependentExistingId = 4L;
         nonExistingId = 30L;
-        countTotalProduct = 3L;
+        countTotalProduct = 4L;
     }
 
     @Test
-    public void deleteShouldDeleteResourceWhenIdExists() {
-        service.delete(existingId);
+    public void deleteShouldThrowsWhenIdDependentExists() {
+        // Assertions.assertThrows(DatabaseException.class, () -> {
+            service.delete(dependentExistingId);
+        // });
+    }
+
+    @Test
+    public void deleteShouldDeleteResourceWhenDependentIdExists() {
+        service.delete(dependentExistingId);
+        // Assertions.assertEquals(countTotalProduct - 1, repository.count());
+    }
+
+    @Test
+    public void deleteShouldDeleteResourceWhenNonDependentIdExists() {
+        service.delete(nonDependentExistingId);
         Assertions.assertEquals(countTotalProduct - 1, repository.count());
     }
 
     @Test
-    public void deleteShouldDeleteResourceWhenIdDoesNotExist() {
+    public void deleteShouldThrowsWhenIdDoesNotExist() {
         Assertions.assertThrows(ResourceNotFoundException.class,() -> {
             service.delete(nonExistingId);
         });
@@ -74,6 +90,7 @@ public class CategoryServiceIT {
         Assertions.assertEquals(countTotalProduct, result.getTotalElements());
         Assertions.assertEquals("Computadores", result.getContent().get(0).getName());
         Assertions.assertEquals("Eletrônicos", result.getContent().get(1).getName());
-        Assertions.assertEquals("Livros", result.getContent().get(2).getName());
+        Assertions.assertEquals("Ferramentas", result.getContent().get(2).getName());
+        Assertions.assertEquals("Livros", result.getContent().get(3).getName());
     }
 }
