@@ -81,5 +81,4 @@ public class ProductService {
 		entity.getCategories().clear();
 		dto.getCategories().forEach(catDto -> entity.getCategories().add(categoryRepository.getOne(catDto.getId())));
 	}
-
 }
