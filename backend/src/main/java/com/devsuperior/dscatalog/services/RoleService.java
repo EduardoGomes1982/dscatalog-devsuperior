@@ -47,7 +47,7 @@ public class RoleService {
 	@Transactional(readOnly = false)
 	public RoleDTO update(Long id, RoleDTO dto) {
 		try {
-			Role entity = repository.getOne(id);
+			Role entity = repository.getReferenceById(id);
 			entity.setAuthority(dto.getAuthority());
 			entity = repository.save(entity);
 			return new RoleDTO(entity);

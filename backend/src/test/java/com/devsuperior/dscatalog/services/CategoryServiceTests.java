@@ -57,8 +57,8 @@ public class CategoryServiceTests {
         Mockito.when(categoryRepository.save(ArgumentMatchers.any())).thenReturn(category);
         Mockito.when(categoryRepository.findById(existingId)).thenReturn(Optional.of(category));
         Mockito.when(categoryRepository.findById(nonExistingId)).thenReturn(Optional.empty());
-        Mockito.when(categoryRepository.getOne(existingId)).thenReturn(category);
-        Mockito.when(categoryRepository.getOne(nonExistingId)).thenThrow(ResourceNotFoundException.class);
+        Mockito.when(categoryRepository.getReferenceById(existingId)).thenReturn(category);
+        Mockito.when(categoryRepository.getReferenceById(nonExistingId)).thenThrow(ResourceNotFoundException.class);
     }
 
     @Test
