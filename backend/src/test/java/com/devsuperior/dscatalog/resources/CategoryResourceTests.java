@@ -7,7 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
@@ -21,10 +22,15 @@ import com.devsuperior.dscatalog.services.CategoryService;
 import com.devsuperior.dscatalog.services.exceptions.DatabaseException;
 import com.devsuperior.dscatalog.services.exceptions.ResourceNotFoundException;
 import com.devsuperior.dscatalog.tests.Factory;
+import com.devsuperior.dscatalog.tests.TokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@WebMvcTest(CategoryResource.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class CategoryResourceTests {
+    @Autowired
+	private TokenUtil tokenUtil;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -39,6 +45,8 @@ public class CategoryResourceTests {
     private long dependentId;
     private CategoryDTO categoryDTO;
     private PageImpl<CategoryDTO> page;
+    private String username;
+    private String password;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -46,6 +54,8 @@ public class CategoryResourceTests {
         nonExistingId = 2L;
         categoryDTO = Factory.createCategoryDTO();
         page = new PageImpl<>(List.of(categoryDTO));
+        username = "maria@gmail.com";
+        password = "123456";
         Mockito.when(categoryService.findAllPaged(ArgumentMatchers.any())).thenReturn(page);
         Mockito.when(categoryService.findByID(existingId)).thenReturn(categoryDTO);
         Mockito.when(categoryService.findByID(nonExistingId)).thenThrow(ResourceNotFoundException.class);
@@ -83,9 +93,11 @@ public class CategoryResourceTests {
 
     @Test
     public void updateShouldReturnProductDTOWhenIdExists() throws Exception {
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
         String jsonBody = objectMapper.writeValueAsString(categoryDTO);
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.put("/categories/{id}", existingId)
-                .content(jsonBody).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
+            .header("Authorization", "Bearer " + accessToken)
+            .content(jsonBody).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
         result.andExpect(MockMvcResultMatchers.status().isOk());
         result.andExpect(MockMvcResultMatchers.jsonPath("$.id").exists());
         result.andExpect(MockMvcResultMatchers.jsonPath("$.name").exists());
@@ -93,38 +105,48 @@ public class CategoryResourceTests {
 
     @Test
     public void updateShouldReturnNotFoundWhenIdDoesNotExist() throws Exception {
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
         String jsonBody = objectMapper.writeValueAsString(categoryDTO);
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.put("/categories/{id}", nonExistingId)
-                .content(jsonBody).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
+            .header("Authorization", "Bearer " + accessToken)
+            .content(jsonBody).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
         result.andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
     public void deleteShouldReturnNoContentWhenIdExists() throws Exception {
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.delete("/categories/{id}", existingId)
-                .accept(MediaType.APPLICATION_JSON));
+            .header("Authorization", "Bearer " + accessToken)
+            .accept(MediaType.APPLICATION_JSON));
         result.andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
     @Test
     public void deleteShouldReturnNotFoundWhenIdDoesNotExist() throws Exception {
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.delete("/categories/{id}", nonExistingId)
-                .accept(MediaType.APPLICATION_JSON));
+            .header("Authorization", "Bearer " + accessToken)
+            .accept(MediaType.APPLICATION_JSON));
         result.andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
     public void deleteShouldReturnBadRequestWhenDependentId() throws Exception {
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.delete("/categories/{id}", dependentId)
-                .accept(MediaType.APPLICATION_JSON));
+            .header("Authorization", "Bearer " + accessToken)
+            .accept(MediaType.APPLICATION_JSON));
         result.andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
 
     @Test
     public void insertShouldReturnProductDTOCreated() throws Exception {
+        String accessToken = tokenUtil.obtainAccessToken(mockMvc, username, password);
         String jsonBody = objectMapper.writeValueAsString(categoryDTO);
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/categories")
-                .content(jsonBody).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
+            .header("Authorization", "Bearer " + accessToken)
+            .content(jsonBody).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON));
         result.andExpect(MockMvcResultMatchers.status().isCreated());
         result.andExpect(MockMvcResultMatchers.jsonPath("$.id").exists());
         result.andExpect(MockMvcResultMatchers.jsonPath("$.name").exists());
